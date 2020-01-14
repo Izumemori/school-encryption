@@ -18,6 +18,13 @@ defmodule Main do
         t: :text,
         d: :decode,
         e: :encode
+      ],
+      help:
+      [
+        key: "The key to use for encryption/decryption",
+        text: "The encrypted string to be decrypted or the plaintext string to be encrypted",
+        decode: "Flag to indicate if the string should be decoded",
+        encode: "Flag to indicate if the string should be encoded"
       ]
     ]
 
@@ -25,12 +32,16 @@ defmodule Main do
 
     result = \
     case opts do
+      [key: _key, text: _text, decode: _decode, encode: _encode] ->
+        print_help(options)
       [key: key, text: text, decode: true] ->
         decrypt(key, text)
       [key: key, text: text, encode: true] ->
         encrypt(key, text)
+      [key: key, text: text] ->
+        encrypt(key, text)
       _ ->
-        {:error, "Invalid parameters"}
+        print_help(options)
     end
 
     case result do
@@ -39,5 +50,21 @@ defmodule Main do
       {:ok, x} ->
         IO.puts(x)
     end
+  end
+
+  defp print_help(options) do
+
+    result = \
+    "Usage: encryption [options]\n\n" <>
+    "## General options\n" <>
+    for {key, _key} <- options[:switches], into: "" do
+      aliases = \
+      for {alias, _key} <- options[:aliases] |> Enum.filter(fn a -> a |> elem(1) == key end), into: "" do
+        "-#{alias}, "
+      end
+
+      "    #{aliases}--#{key}\t#{options[:help][key]}\n"
+    end
+    {:ok, result}
   end
 end
