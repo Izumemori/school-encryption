@@ -92,33 +92,51 @@ defmodule Encryption do
 
   @spec encrypt(key, input) :: {:ok, encrypted}
   def encrypt(key, text) do
+
     text_charlist = \
     text
     |> to_charlist()
-    |> Enum.map(fn a ->
-      <<first, second, third, fourth>> = <<a :: utf32>>
-      [first, second, third, fourth]
-    end) # Expand bitstring and add the 4 values as an enum to the enum
-    |> List.flatten()
-    |> Enum.with_index() # Add index
 
     key_charlist = \
     key
     |> to_charlist()
-    |> Enum.with_index() # Add index
 
     key_length = \
     key_charlist
     |> Enum.count() # Cache key length
 
-    byte_arr = \
-    for {t, i} <- text_charlist, into: [] do
-      key_charlist
-      |> Enum.at(rem(i, key_length))
-      |> elem(0) # Get only the value, not the index
-      |> Kernel.+(t)
-    end
+    text_length = \
+    text_charlist
+    |> Enum.count() # Cache text length
 
-    {:ok, encode64(byte_arr |> to_string())} # Convert bytes to base64 byte enum and then to string
+    with true <- key_length
+      |> Kernel.>=(text_length
+        |> Kernel.*(4))
+    do
+      text_charlist = \
+      text_charlist
+      |> Enum.map(fn a ->
+        <<first, second, third, fourth>> = <<a :: utf32>>
+        [first, second, third, fourth]
+      end) # Expand bitstring and add the 4 values as an enum to the enum
+      |> List.flatten()
+      |> Enum.with_index() # Add index
+
+      key_charlist = \
+      key_charlist
+      |> Enum.with_index() # Add index
+
+      byte_arr = \
+      for {t, i} <- text_charlist, into: [] do
+        key_charlist
+        |> Enum.at(rem(i, key_length))
+        |> elem(0) # Get only the value, not the index
+        |> Kernel.+(t)
+      end
+
+      {:ok, encode64(byte_arr |> to_string())} # Convert bytes to base64 byte enum and then to string
+    else
+      _ -> {:error, "Key too long"}
+    end
   end
 end

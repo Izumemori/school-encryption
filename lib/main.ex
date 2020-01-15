@@ -47,13 +47,14 @@ defmodule Main do
     case result do
       {:error, x} ->
         IO.puts(:stderr, x)
+        :ok
       {:ok, x} ->
         IO.puts(x)
+        :ok
     end
   end
 
   defp print_help(options) do
-
     result = \
     "Usage: encryption [options]\n\n" <>
     "## General options\n" <>
