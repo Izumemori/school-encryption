@@ -10,21 +10,24 @@ defmodule Main do
         key: :string,
         text: :string,
         decode: :boolean,
-        encode: :boolean
+        encode: :boolean,
+        help: :boolean
       ],
       aliases:
       [
         k: :key,
         t: :text,
         d: :decode,
-        e: :encode
+        e: :encode,
+        h: :help
       ],
       help:
       [
         key: "The key to use for encryption/decryption",
         text: "The encrypted string to be decrypted or the plaintext string to be encrypted",
         decode: "Flag to indicate if the string should be decoded",
-        encode: "Flag to indicate if the string should be encoded"
+        encode: "Flag to indicate if the string should be encoded",
+        help: "Prints this help"
       ]
     ]
 
@@ -40,6 +43,8 @@ defmodule Main do
         encrypt(key, text)
       [key: key, text: text] ->
         encrypt(key, text)
+      [help: true] ->
+        print_help(options)
       _ ->
         print_help(options)
     end

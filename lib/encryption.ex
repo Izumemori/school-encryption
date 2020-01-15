@@ -110,7 +110,7 @@ defmodule Encryption do
     |> Enum.count() # Cache text length
 
     with true <- key_length
-      |> Kernel.>=(text_length
+      |> Kernel.<=(text_length
         |> Kernel.*(4))
     do
       text_charlist = \
